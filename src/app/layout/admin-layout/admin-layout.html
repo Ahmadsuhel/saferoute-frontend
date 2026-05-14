@@ -1,0 +1,19 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span>SafeRoute</span>
+      <span class="badge">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard"  routerLinkActive="active" class="sidebar-item">Dashboard</a>
+      <a routerLink="/admin/heatmap"    routerLinkActive="active" class="sidebar-item">Heatmap</a>
+      <a routerLink="/admin/analytics"  routerLinkActive="active" class="sidebar-item">Analytics</a>
+      <a routerLink="/admin/moderation" routerLinkActive="active" class="sidebar-item">Moderation</a>
+      <a routerLink="/admin/users"      routerLinkActive="active" class="sidebar-item">Users</a>
+    </nav>
+    <button class="sidebar-logout" (click)="logout()">Sign out</button>
+  </aside>
+  <main class="admin-content">
+    <router-outlet/>
+  </main>
+</div>

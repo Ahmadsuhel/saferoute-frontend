@@ -1,0 +1,66 @@
+<div class="profile-page">
+
+  <div class="page-header">
+    <h1>Profile</h1>
+  </div>
+
+  <div class="profile-layout">
+
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="avatar-lg">
+        {{ auth.currentUser?.name?.charAt(0)?.toUpperCase() || 'U' }}
+      </div>
+      <h2>{{ auth.currentUser?.name }}</h2>
+      <p class="email">{{ auth.currentUser?.email }}</p>
+      <div class="role-badge" [class.admin]="auth.isAdmin">
+        {{ auth.currentUser?.role }}
+      </div>
+    </div>
+
+    <!-- Info card -->
+    <div class="info-card">
+      <h3>Personal Information</h3>
+      <div class="info-list">
+        <div class="info-row">
+          <span class="info-label">Full name</span>
+          <span class="info-val">{{ auth.currentUser?.name || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-val">{{ auth.currentUser?.email || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Phone</span>
+          <span class="info-val">{{ auth.currentUser?.phone || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">City</span>
+          <span class="info-val">{{ auth.currentUser?.city || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Account type</span>
+          <span class="info-val">{{ auth.currentUser?.role }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Verified</span>
+          <span class="info-val" [style.color]="auth.currentUser?.isVerified ? '#1D9E75' : '#E5A020'">
+            {{ auth.currentUser?.isVerified ? 'Yes ✓' : 'No' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-card">
+      <button class="action-btn danger" (click)="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+        Sign out
+      </button>
+    </div>
+
+  </div>
+
+</div>

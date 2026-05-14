@@ -1,0 +1,69 @@
+<div class="nearby-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Nearby Incidents</h1>
+      <p>Showing incidents within {{ radius }}km of your location</p>
+    </div>
+    <a routerLink="/incidents/report" class="report-btn">
+      + Report
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner-lg"></div>
+      <p>Fetching nearby incidents...</p>
+    </div>
+  }
+
+  @if (!loading && incidents.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <h3>All clear!</h3>
+      <p>No incidents reported in your area. Stay safe!</p>
+    </div>
+  }
+
+  @if (!loading && incidents.length > 0) {
+    <div class="incidents-grid">
+      @for (inc of incidents; track inc.id) {
+        <div class="incident-card" [style.border-color]="getRiskColor(inc.type) + '20'">
+          <div class="inc-header">
+            <div class="inc-icon" [style.background]="getRiskBg(inc.type)">
+              {{ getTypeIcon(inc.type) }}
+            </div>
+            <div class="inc-type-info">
+              <h3 [style.color]="getRiskColor(inc.type)">{{ inc.type }}</h3>
+              <span class="inc-status" [class]="inc.status.toLowerCase()">
+                {{ inc.status }}
+              </span>
+            </div>
+            @if (inc.distanceKm !== undefined) {
+              <span class="inc-dist">{{ formatDist(inc.distanceKm) }}</span>
+            }
+          </div>
+
+          @if (inc.description) {
+            <p class="inc-desc">{{ inc.description }}</p>
+          }
+
+          <div class="inc-footer">
+            <div class="inc-location">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/>
+                <circle cx="12" cy="9" r="2.5"/>
+              </svg>
+              {{ inc.address || inc.city }}
+            </div>
+            <div class="inc-meta">
+              <span class="votes">👍 {{ inc.upvotes }}</span>
+              <span class="time">{{ timeAgo(inc.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -1,0 +1,153 @@
+<div class="register-wrap">
+
+  <div class="register-header">
+    <h2>Create account</h2>
+    <p>Join SafeRoute and navigate safely</p>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step" [class.active]="step === 1" [class.done]="step > 1">
+      <div class="step-dot">
+        @if (step > 1) { <span>✓</span> } @else { <span>1</span> }
+      </div>
+      <span class="step-label">Personal Info</span>
+    </div>
+    <div class="step-line" [class.done]="step > 1"></div>
+    <div class="step" [class.active]="step === 2">
+      <div class="step-dot"><span>2</span></div>
+      <span class="step-label">Security</span>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <!-- Step 1 -->
+    @if (step === 1) {
+      <div class="step-content">
+
+        <div class="field">
+          <label>Full name</label>
+          <input formControlName="name" type="text" placeholder="Rahul Kumar"
+            [class.error]="name.invalid && name.touched"/>
+          @if (name.invalid && name.touched) {
+            <span class="err">Name must be at least 2 characters</span>
+          }
+        </div>
+
+        <div class="field">
+          <label>Email address</label>
+          <input formControlName="email" type="email" placeholder="you@example.com"
+            [class.error]="email.invalid && email.touched"/>
+          @if (email.invalid && email.touched) {
+            <span class="err">
+              {{ email.errors?.['required'] ? 'Email is required' : 'Invalid email' }}
+            </span>
+          }
+        </div>
+
+        <div class="field">
+          <label>Phone number</label>
+          <div class="phone-wrap">
+            <span class="country-code">🇮🇳 +91</span>
+            <input formControlName="phone" type="tel" placeholder="9876543210"
+              [class.error]="phone.invalid && phone.touched"/>
+          </div>
+          @if (phone.invalid && phone.touched) {
+            <span class="err">Enter valid 10-digit mobile number</span>
+          }
+        </div>
+
+        <div class="field">
+          <label>City</label>
+          <select formControlName="city" class="select">
+            @for (c of cities; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <button type="button" class="btn-primary" (click)="nextStep()">
+          Continue
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+      </div>
+    }
+
+    <!-- Step 2 -->
+    @if (step === 2) {
+      <div class="step-content">
+
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input formControlName="password"
+              [type]="showPass ? 'text' : 'password'"
+              placeholder="Create a strong password"
+              [class.error]="password.invalid && password.touched"/>
+            <button type="button" class="toggle-pass" (click)="showPass = !showPass">
+              {{ showPass ? '🙈' : '👁️' }}
+            </button>
+          </div>
+
+          <!-- Password strength -->
+          @if (password.value) {
+            <div class="strength">
+              <div class="strength-bars">
+                @for (i of [1,2,3,4,5]; track i) {
+                  <div class="strength-bar"
+                    [style.background]="i <= passwordStrength ? strengthColor : 'rgba(255,255,255,0.06)'">
+                  </div>
+                }
+              </div>
+              <span class="strength-label" [style.color]="strengthColor">
+                {{ strengthLabel }}
+              </span>
+            </div>
+          }
+
+          @if (password.invalid && password.touched) {
+            <span class="err">Password must be at least 6 characters</span>
+          }
+        </div>
+
+        <!-- Password hints -->
+        <div class="hints">
+          <div class="hint" [class.done]="password.value?.length >= 6">
+            <span class="hint-dot"></span> At least 6 characters
+          </div>
+          <div class="hint" [class.done]="/[A-Z]/.test(password.value || '')">
+            <span class="hint-dot"></span> One uppercase letter
+          </div>
+          <div class="hint" [class.done]="/[0-9]/.test(password.value || '')">
+            <span class="hint-dot"></span> One number
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" (click)="step = 1">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+          </button>
+          <button type="submit" class="btn-primary flex1" [disabled]="loading">
+            @if (loading) { <span class="spinner"></span> }
+            @else { Create account }
+          </button>
+        </div>
+
+      </div>
+    }
+
+  </form>
+
+  <p class="switch">
+    Already have an account?
+    <a routerLink="/auth/login">Sign in</a>
+  </p>
+
+</div>

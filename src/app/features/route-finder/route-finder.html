@@ -1,0 +1,190 @@
+<div class="route-finder">
+
+  <div class="page-header">
+    <h1>Safe Route Finder</h1>
+    <p>AI-powered routing that avoids danger zones</p>
+  </div>
+
+  <div class="finder-layout">
+
+    <!-- Left — Form -->
+    <div class="form-panel">
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Source -->
+        <div class="route-input-group">
+          <div class="route-point source">
+            <div class="point-dot green"></div>
+            <div class="point-fields">
+              <div class="field">
+                <label>From</label>
+                <div class="input-row">
+                  <input formControlName="sourceAddr" type="text" placeholder="Enter starting point" />
+                  <button type="button" class="location-btn" (click)="useMyLocation()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="coords-row">
+                <input formControlName="sourceLat" type="number" placeholder="Latitude" class="coord" />
+                <input formControlName="sourceLng" type="number" placeholder="Longitude" class="coord" />
+              </div>
+            </div>
+          </div>
+
+          <div class="route-line"></div>
+
+          <!-- Destination -->
+          <div class="route-point dest">
+            <div class="point-dot red"></div>
+            <div class="point-fields">
+              <div class="field">
+                <label>To</label>
+                <input formControlName="destAddr" type="text" placeholder="Enter destination" />
+              </div>
+              <div class="coords-row">
+                <input formControlName="destLat" type="number" placeholder="Latitude" class="coord" />
+                <input formControlName="destLng" type="number" placeholder="Longitude" class="coord" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- City -->
+        <div class="field">
+          <label>City</label>
+          <select formControlName="city" class="select">
+            <option value="Delhi">Delhi</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Bangalore">Bangalore</option>
+            <option value="Hyderabad">Hyderabad</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-find" [disabled]="loading || geocoding">
+          @if (loading || geocoding) {
+          <span class="spinner"></span>
+          {{ geocoding ? 'Finding location...' : 'Calculating...' }}
+          } @else {
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          Find Safe Route
+          }
+        </button>
+
+
+
+      </form>
+
+      <!-- Result -->
+      @if (result) {
+      <div class="result-card" [@fadeIn]>
+
+        <div class="result-header">
+          <div class="score-ring">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8" />
+              <circle cx="60" cy="60" r="54" fill="none" [attr.stroke]="riskColor" stroke-width="8"
+                [attr.stroke-dasharray]="2 * 3.14159 * 54" [attr.stroke-dashoffset]="scoreOffset" stroke-linecap="round"
+                transform="rotate(-90 60 60)" />
+              <text x="60" y="52" text-anchor="middle" fill="white" font-size="28" font-weight="700"
+                font-family="Space Grotesk, sans-serif">
+                {{ result.routes[0]?.safetyScore }}
+              </text>
+              <text x="60" y="70" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="11"
+                font-family="Inter, sans-serif">
+                Safety Score
+              </text>
+            </svg>
+          </div>
+
+          <div class="result-info">
+            <div class="risk-badge" [style.background]="riskColor + '20'" [style.color]="riskColor"
+              [style.border-color]="riskColor + '40'">
+              {{ riskLabel }}
+            </div>
+            <div class="route-stats">
+              <div class="stat">
+                <span class="stat-val">{{ result.routes[0]?.distance }} km</span>
+                <span class="stat-key">Distance</span>
+              </div>
+              <div class="stat-div"></div>
+              <div class="stat">
+                <span class="stat-val">{{ result.routes[0]?.duration }} min</span>
+                <span class="stat-key">Duration</span>
+              </div>
+              <div class="stat-div"></div>
+              <div class="stat">
+                <span class="stat-val">{{ result.incidents }}</span>
+                <span class="stat-key">Incidents</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Incident types -->
+        @if (result.summary?.incidentTypes?.length > 0) {
+        <div class="incident-types">
+          <p class="types-label">Incidents in area:</p>
+          <div class="types-wrap">
+            @for (type of result.summary.incidentTypes; track type) {
+            <span class="type-chip">{{ type }}</span>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- Routes list -->
+        <div class="routes-list">
+          @for (route of result.routes; track route.routeIndex) {
+          <div class="route-option" [class.safest]="route.isSafest">
+            <div class="route-badges">
+              @if (route.isSafest) { <span class="badge green">Safest</span> }
+              @if (route.isFastest) { <span class="badge blue">Fastest</span> }
+            </div>
+            <div class="route-details">
+              <span>{{ route.distance }} km</span>
+              <span>{{ route.duration }} min</span>
+              <span [style.color]="route.color">Score: {{ route.safetyScore }}</span>
+            </div>
+          </div>
+          }
+        </div>
+
+      </div>
+      }
+
+    </div>
+    <!-- <div class="map-panel">
+  <div id="route-map" class="leaflet-map"></div>
+</div> -->
+    <!-- Right — Map placeholder -->
+    <!-- <div class="map-panel">
+      <div class="map-placeholder">
+        <div class="map-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(29,158,117,0.4)" stroke-width="1.5" stroke-linecap="round">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+            <line x1="9" y1="3" x2="9" y2="18"/>
+            <line x1="15" y1="6" x2="15" y2="21"/>
+          </svg>
+        </div>
+        <p>Map view</p>
+        <span>Enter locations and calculate route to see the path</span>
+      </div>
+    </div> -->
+
+    <!-- Right — Map -->
+    <div class="map-panel">
+      <div id="route-map" class="leaflet-map"></div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,112 @@
+<div class="report-page">
+
+  <div class="page-header">
+    <h1>Report Incident</h1>
+    <p>Help the community stay safe by reporting incidents</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="report-layout">
+
+      <!-- Left -->
+      <div class="left-col">
+
+        <!-- Type selector -->
+        <div class="card">
+          <h3 class="card-title">Incident type</h3>
+          <div class="type-grid">
+            @for (type of types; track type.value) {
+              <button type="button" class="type-btn"
+                [class.selected]="form.get('type')?.value === type.value"
+                [style.--color]="type.color"
+                (click)="selectType(type.value)">
+                <span class="type-emoji">{{ type.icon }}</span>
+                <span class="type-label">{{ type.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="card">
+          <h3 class="card-title">Description <span class="optional">(optional)</span></h3>
+          <textarea formControlName="description"
+            placeholder="Describe what happened..."
+            rows="4" class="textarea"></textarea>
+        </div>
+
+        <!-- Anonymous toggle -->
+        <div class="card anon-card">
+          <div class="anon-info">
+            <h3>Report anonymously</h3>
+            <p>Your name won't be shown with this report</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" formControlName="isAnonymous"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Right -->
+      <div class="right-col">
+
+        <!-- Location -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Location</h3>
+            <button type="button" class="detect-btn" (click)="detectLocation()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3"/>
+              </svg>
+              Auto detect
+            </button>
+          </div>
+
+          <div class="field">
+            <label>Address</label>
+            <input formControlName="address" type="text" placeholder="Street, landmark..."/>
+          </div>
+
+          <div class="coords-grid">
+            <div class="field">
+              <label>Latitude</label>
+              <input formControlName="latitude" type="number"/>
+            </div>
+            <div class="field">
+              <label>Longitude</label>
+              <input formControlName="longitude" type="number"/>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>City</label>
+            <select formControlName="city" class="select">
+              @for (city of cities; track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          @if (loading) { <span class="spinner"></span> Submitting... }
+          @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+            Submit Report
+          }
+        </button>
+
+      </div>
+
+    </div>
+
+  </form>
+
+</div>

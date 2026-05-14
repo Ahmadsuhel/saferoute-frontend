@@ -1,0 +1,154 @@
+<div class="layout">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L28 8V18C28 24.5 16 31 16 31C16 31 4 24.5 4 18V8L16 2Z"
+            fill="url(#ng)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <path d="M11 16L14.5 19.5L21 13" stroke="white" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="ng" x1="4" y1="2" x2="28" y2="31">
+              <stop offset="0%" stop-color="#1D9E75"/>
+              <stop offset="100%" stop-color="#0D6B4F"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="nav-title">SafeRoute</span>
+    </div>
+
+    <!-- Desktop nav links -->
+    <div class="nav-links">
+      <a routerLink="/home" routerLinkActive="active" class="nav-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        Home
+      </a>
+      <a routerLink="/route-finder" routerLinkActive="active" class="nav-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3"/>
+        </svg>
+        Safe Route
+      </a>
+      <a routerLink="/incidents/nearby" routerLinkActive="active" class="nav-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        Incidents
+      </a>
+    </div>
+
+    <!-- Right side -->
+    <div class="nav-right">
+
+      <!-- SOS button -->
+      <button class="sos-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        SOS
+      </button>
+
+      <!-- Report button -->
+      <a routerLink="/incidents/report" class="report-btn">
+        + Report
+      </a>
+
+      <!-- User menu -->
+      <div class="user-menu" (click)="menuOpen = !menuOpen">
+        <div class="user-avatar">
+          {{ auth.currentUser?.name?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4l4 4 4-4"/>
+        </svg>
+
+        @if (menuOpen) {
+          <div class="dropdown" (click)="$event.stopPropagation()">
+            <div class="dropdown-user">
+              <div class="d-avatar">
+                {{ auth.currentUser?.name?.charAt(0)?.toUpperCase() || 'U' }}
+              </div>
+              <div>
+                <p class="d-name">{{ auth.currentUser?.name }}</p>
+                <p class="d-email">{{ auth.currentUser?.email }}</p>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/profile" class="dropdown-item" (click)="menuOpen=false">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Profile
+            </a>
+            @if (auth.isAdmin) {
+              <a routerLink="/admin/dashboard" class="dropdown-item" (click)="menuOpen=false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                </svg>
+                Admin Panel
+              </a>
+            }
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item danger" (click)="logout()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+              </svg>
+              Sign out
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="content">
+    <router-outlet/>
+  </main>
+
+  <!-- Bottom nav — mobile -->
+  <nav class="bottom-nav">
+    <a routerLink="/home" routerLinkActive="active" class="bottom-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a routerLink="/route-finder" routerLinkActive="active" class="bottom-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="10" r="3"/>
+        <path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/>
+      </svg>
+      <span>Routes</span>
+    </a>
+    <a routerLink="/incidents/report" class="bottom-item sos-mobile">
+      <div class="sos-circle">SOS</div>
+    </a>
+    <a routerLink="/incidents/nearby" routerLinkActive="active" class="bottom-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      </svg>
+      <span>Alerts</span>
+    </a>
+    <a routerLink="/profile" routerLinkActive="active" class="bottom-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+
+</div>
