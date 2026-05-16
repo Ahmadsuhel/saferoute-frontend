@@ -24,7 +24,7 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./layout/main-layout/main-layout')
-      .then(m => m.MainLayout),
+      .then(m => m.MainLayoutComponent),
     children: [
       { path: 'home',             loadComponent: () => import('./features/home/home').then(m => m.Home) },
       { path: 'route-finder',     loadComponent: () => import('./features/route-finder/route-finder').then(m => m.RouteFinderComponent) },

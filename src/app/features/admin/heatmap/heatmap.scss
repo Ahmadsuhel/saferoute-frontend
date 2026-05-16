@@ -1,0 +1,91 @@
+.heatmap-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+  p { font-size: 14px; color: rgba(255,255,255,0.35); margin: 0 }
+}
+
+.city-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.city-btn {
+  padding: 7px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+
+  &:hover { background: rgba(255,255,255,0.07) }
+  &.active {
+    background: rgba(29,158,117,0.1);
+    border-color: rgba(29,158,117,0.25);
+    color: #1D9E75;
+    font-weight: 600;
+  }
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+
+  @media (max-width: 600px) { grid-template-columns: repeat(2, 1fr) }
+}
+
+.summary-card {
+  padding: 16px 18px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.safe    { background: rgba(29,158,117,0.08);  border: 1px solid rgba(29,158,117,0.15) }
+  &.caution { background: rgba(229,160,32,0.08);  border: 1px solid rgba(229,160,32,0.15) }
+  &.danger  { background: rgba(216,90,48,0.08);   border: 1px solid rgba(216,90,48,0.15) }
+  &.total   { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06) }
+
+  .s-count {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .s-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+  }
+}
+
+.heatmap-container {
+  height: 520px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}

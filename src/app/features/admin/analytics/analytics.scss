@@ -1,0 +1,260 @@
+.analytics {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+  p { font-size: 14px; color: rgba(255,255,255,0.35); margin: 0 }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-top-color: #1D9E75;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin { to { transform: rotate(360deg) } }
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr }
+}
+
+.card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 18px;
+  padding: 22px;
+
+  &.wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  margin: 0 0 20px;
+}
+
+// Bar list
+.bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .bar-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    width: 130px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      min-width: 4px;
+    }
+  }
+
+  .bar-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    width: 24px;
+    text-align: right;
+  }
+}
+
+// Status list
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.pending  { background: #E5A020 }
+    &.verified { background: #1D9E75 }
+    &.rejected { background: #D85A30 }
+  }
+
+  .status-name {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 500;
+    flex: 1;
+    text-transform: capitalize;
+  }
+
+  .status-count {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+// Trend
+.trend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .trend-date {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  .trend-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+
+    .trend-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #534AB7, #9B93F5);
+      border-radius: 3px;
+      min-width: 4px;
+      transition: width 0.5s ease;
+    }
+  }
+
+  .trend-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    width: 20px;
+    text-align: right;
+  }
+}
+
+// City list
+.city-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.city-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+
+  .city-name {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+  }
+
+  .city-count {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+  }
+}
+
+// Hotspots
+.hotspot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hotspot-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(216,90,48,0.04);
+  border: 1px solid rgba(216,90,48,0.08);
+  border-radius: 12px;
+
+  .hotspot-icon { font-size: 18px }
+
+  .hotspot-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .hotspot-city {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .hotspot-coords {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      font-family: 'Inter', monospace;
+    }
+  }
+
+  .hotspot-count {
+    font-size: 16px;
+    font-weight: 700;
+    color: #D85A30;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}

@@ -1,1 +1,107 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+
+  <div class="page-header">
+    <h1>Admin Dashboard</h1>
+    <p>SafeRoute system overview</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading">
+      <div class="spinner"></div>
+    </div>
+  }
+
+  @if (!loading && stats) {
+
+    <!-- Stats grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(29,158,117,0.1);color:#1D9E75">👥</div>
+        <div class="stat-info">
+          <span class="stat-val">{{ stats.totalUsers }}</span>
+          <span class="stat-key">Total Users</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(229,160,32,0.1);color:#E5A020">🚨</div>
+        <div class="stat-info">
+          <span class="stat-val">{{ stats.totalIncidents }}</span>
+          <span class="stat-key">Total Incidents</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(216,90,48,0.1);color:#D85A30">⏳</div>
+        <div class="stat-info">
+          <span class="stat-val">{{ stats.pendingIncidents }}</span>
+          <span class="stat-key">Pending Review</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(83,74,183,0.1);color:#9B93F5">✅</div>
+        <div class="stat-info">
+          <span class="stat-val">{{ stats.verifiedIncidents }}</span>
+          <span class="stat-key">Verified</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(29,158,117,0.1);color:#1D9E75">🗺️</div>
+        <div class="stat-info">
+          <span class="stat-val">{{ stats.totalRoutes }}</span>
+          <span class="stat-key">Routes Calculated</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(229,160,32,0.1);color:#E5A020">📅</div>
+        <div class="stat-info">
+          <span class="stat-val">{{ stats.todayIncidents }}</span>
+          <span class="stat-key">Today's Incidents</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-grid">
+
+      <!-- Incidents by type -->
+      <div class="card">
+        <h3 class="card-title">Incidents by Type</h3>
+        <div class="type-list">
+          @for (item of incidentsByType; track item.type) {
+            <div class="type-row">
+              <span class="type-name">{{ item.type }}</span>
+              <div class="type-bar-wrap">
+                <div class="type-bar"
+                  [style.width.%]="(item.count / stats.totalIncidents) * 100">
+                </div>
+              </div>
+              <span class="type-count">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Recent incidents -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Recent Incidents</h3>
+          <a routerLink="/admin/moderation" class="see-all">See all</a>
+        </div>
+        <div class="recent-list">
+          @for (inc of recentIncidents; track inc.id) {
+            <div class="recent-row">
+              <div class="recent-info">
+                <span class="recent-type">{{ inc.type }}</span>
+                <span class="recent-city">{{ inc.city }}</span>
+              </div>
+              <span class="recent-status" [class]="inc.status.toLowerCase()">
+                {{ inc.status }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+  }
+
+</div>

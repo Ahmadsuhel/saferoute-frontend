@@ -1,1 +1,57 @@
-<p>users works!</p>
+<div class="users-page">
+
+  <div class="page-header">
+    <div>
+      <h1>User Management</h1>
+      <p>Manage all registered users</p>
+    </div>
+    <div class="total-badge">{{ total }} users</div>
+  </div>
+
+  @if (loading) {
+    <div class="loading"><div class="spinner"></div></div>
+  }
+
+  @if (!loading) {
+    <div class="users-table">
+      <div class="table-header">
+        <span>User</span>
+        <span>City</span>
+        <span>Role</span>
+        <span>Incidents</span>
+        <span>Status</span>
+        <span>Actions</span>
+      </div>
+
+      @for (user of users; track user.id) {
+        <div class="table-row" [class.banned]="!user.isActive">
+          <div class="user-cell">
+            <div class="avatar">{{ getInitial(user.name) }}</div>
+            <div class="user-info">
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
+          </div>
+          <span class="city">{{ user.city }}</span>
+          <span class="role-badge" [class]="user.role.toLowerCase()">
+            {{ user.role }}
+          </span>
+          <span class="incidents-count">{{ user._count?.incidents || 0 }}</span>
+          <span class="status-badge" [class.active]="user.isActive" [class.banned]="!user.isActive">
+            {{ user.isActive ? 'Active' : 'Banned' }}
+          </span>
+          <div class="actions">
+            @if (user.role !== 'ADMIN') {
+              @if (user.isActive) {
+                <button class="btn-ban" (click)="banUser(user.id, 'BAN')">Ban</button>
+              } @else {
+                <button class="btn-unban" (click)="banUser(user.id, 'UNBAN')">Unban</button>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

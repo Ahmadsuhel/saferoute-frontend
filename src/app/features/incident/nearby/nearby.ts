@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
 import { CommonModule }      from '@angular/common'
 import { RouterLink }        from '@angular/router'
 import { HttpClient }        from '@angular/common/http'
@@ -15,14 +15,15 @@ import { NotificationService } from '../../../core/services/notification.service
 export class NearbyComponent implements OnInit {
 
   incidents: any[] = []
-  loading  = true
-  lat      = 28.6139
-  lng      = 77.2090
-  radius   = 5
+  loading   = true
+  lat       = 28.6139
+  lng       = 77.2090
+  radius    = 10  // 5 se 10 kar diya — zyada coverage
 
   constructor(
     private http:   HttpClient,
-    private notify: NotificationService
+    private notify: NotificationService,
+    private cdr:    ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +38,10 @@ export class NearbyComponent implements OnInit {
           this.lng = pos.coords.longitude
           this.loadIncidents()
         },
-        () => this.loadIncidents()
+        () => {
+          // Location nahi mili — default Delhi use karo
+          this.loadIncidents()
+        }
       )
     } else {
       this.loadIncidents()
@@ -46,13 +50,19 @@ export class NearbyComponent implements OnInit {
 
   loadIncidents(): void {
     this.loading = true
+    this.cdr.detectChanges()
+
     const url = `${environment.apiUrl}/incidents/nearby?lat=${this.lat}&lng=${this.lng}&radius=${this.radius}`
     this.http.get(url).subscribe({
       next: (res: any) => {
         this.incidents = res.data || []
         this.loading   = false
+        this.cdr.detectChanges()  // ← FIX
       },
-      error: () => { this.loading = false }
+      error: () => {
+        this.loading = false
+        this.cdr.detectChanges()
+      }
     })
   }
 
@@ -79,7 +89,7 @@ export class NearbyComponent implements OnInit {
   }
 
   formatDist(km: number): string {
-    if (!km) return ''
+    if (km === undefined || km === null) return ''
     if (km < 1) return `${Math.round(km * 1000)}m`
     return `${km.toFixed(1)}km`
   }

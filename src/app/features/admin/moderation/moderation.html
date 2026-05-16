@@ -1,1 +1,71 @@
-<p>moderation works!</p>
+<div class="moderation">
+
+  <div class="page-header">
+    <div>
+      <h1>Incident Moderation</h1>
+      <p>Review and approve or reject reported incidents</p>
+    </div>
+    <div class="total-badge">{{ total }} pending</div>
+  </div>
+
+  @if (loading) {
+    <div class="loading"><div class="spinner"></div></div>
+  }
+
+  @if (!loading && incidents.length === 0) {
+    <div class="empty">
+      <div class="empty-icon">✅</div>
+      <h3>All clear!</h3>
+      <p>No pending incidents to review</p>
+    </div>
+  }
+
+  @if (!loading && incidents.length > 0) {
+    <div class="incident-list">
+      @for (inc of incidents; track inc.id) {
+        <div class="incident-card">
+
+          <div class="inc-left">
+            <div class="inc-type" [style.color]="getRiskColor(inc.type)">
+              {{ inc.type }}
+            </div>
+            <div class="inc-meta">
+              <span>📍 {{ inc.address || inc.city }}</span>
+              <span>🕐 {{ timeAgo(inc.createdAt) }}</span>
+              @if (inc.reporter) {
+                <span>👤 {{ inc.reporter.name }}</span>
+              } @else {
+                <span>👤 Anonymous</span>
+              }
+            </div>
+            @if (inc.description) {
+              <p class="inc-desc">{{ inc.description }}</p>
+            }
+            <div class="inc-votes">
+              <span class="vote up">👍 {{ inc.upvotes }}</span>
+              <span class="vote down">👎 {{ inc.downvotes }}</span>
+              <span class="vote flag">🚩 {{ inc.flags }}</span>
+            </div>
+          </div>
+
+          <div class="inc-actions">
+            <button class="btn-approve" (click)="moderate(inc.id, 'APPROVE')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+              Approve
+            </button>
+            <button class="btn-reject" (click)="moderate(inc.id, 'REJECT')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+              Reject
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

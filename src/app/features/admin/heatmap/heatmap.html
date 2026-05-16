@@ -1,1 +1,40 @@
-<p>heatmap works!</p>
+<div class="heatmap-page">
+
+  <div class="page-header">
+    <div>
+      <h1>City Risk Heatmap</h1>
+      <p>Visual risk distribution across the city</p>
+    </div>
+    <div class="city-selector">
+      @for (c of cities; track c) {
+        <button class="city-btn" [class.active]="city === c" (click)="changeCity(c)">
+          {{ c }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (data) {
+    <div class="summary-row">
+      <div class="summary-card safe">
+        <span class="s-count">{{ data.summary?.safeCells || 0 }}</span>
+        <span class="s-label">Safe zones</span>
+      </div>
+      <div class="summary-card caution">
+        <span class="s-count">{{ data.summary?.cautionCells || 0 }}</span>
+        <span class="s-label">Caution zones</span>
+      </div>
+      <div class="summary-card danger">
+        <span class="s-count">{{ data.summary?.dangerCells || 0 }}</span>
+        <span class="s-label">Danger zones</span>
+      </div>
+      <div class="summary-card total">
+        <span class="s-count">{{ data.totalIncidents || 0 }}</span>
+        <span class="s-label">Total incidents</span>
+      </div>
+    </div>
+  }
+
+  <div id="heatmap" class="heatmap-container"></div>
+
+</div>

@@ -1,1 +1,103 @@
-<p>analytics works!</p>
+<div class="analytics">
+
+  <div class="page-header">
+    <h1>Analytics</h1>
+    <p>Incident trends for last 30 days</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading"><div class="spinner"></div></div>
+  }
+
+  @if (!loading && data) {
+
+    <div class="analytics-grid">
+
+      <!-- By Type -->
+      <div class="card">
+        <h3 class="card-title">Incidents by Type</h3>
+        <div class="bar-list">
+          @for (item of data.byType; track item.type) {
+            <div class="bar-row">
+              <span class="bar-label">{{ item.type }}</span>
+              <div class="bar-track">
+                <div class="bar-fill"
+                  [style.width.%]="getBarWidth(item.count)"
+                  [style.background]="getRiskColor(item.type)">
+                </div>
+              </div>
+              <span class="bar-count">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- By Status -->
+      <div class="card">
+        <h3 class="card-title">Incidents by Status</h3>
+        <div class="status-list">
+          @for (item of data.byStatus; track item.status) {
+            <div class="status-row">
+              <div class="status-dot" [class]="item.status.toLowerCase()"></div>
+              <span class="status-name">{{ item.status }}</span>
+              <span class="status-count">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Daily Trend -->
+      <div class="card wide">
+        <h3 class="card-title">Daily Trend (Last 7 days)</h3>
+        <div class="trend-list">
+          @for (item of data.dailyTrend; track item.date) {
+            <div class="trend-row">
+              <span class="trend-date">{{ item.date | date:'MMM d' }}</span>
+              <div class="trend-bar-track">
+                <div class="trend-bar"
+                  [style.width.%]="getBarWidth(item.count)">
+                </div>
+              </div>
+              <span class="trend-count">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- By City -->
+      <div class="card">
+        <h3 class="card-title">Top Cities</h3>
+        <div class="city-list">
+          @for (item of data.byCity; track item.city) {
+            <div class="city-row">
+              <span class="city-name">📍 {{ item.city }}</span>
+              <span class="city-count">{{ item.count }} incidents</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Top Areas -->
+      <div class="card">
+        <h3 class="card-title">Danger Hotspots</h3>
+        <div class="hotspot-list">
+          @for (area of data.topAreas; track area.latitude) {
+            <div class="hotspot-row">
+              <div class="hotspot-icon">🔥</div>
+              <div class="hotspot-info">
+                <span class="hotspot-city">{{ area.city }}</span>
+                <span class="hotspot-coords">
+                  {{ area.latitude | number:'1.2-2' }}, {{ area.longitude | number:'1.2-2' }}
+                </span>
+              </div>
+              <span class="hotspot-count">{{ area.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+  }
+
+</div>
