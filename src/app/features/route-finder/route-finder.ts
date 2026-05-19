@@ -15,13 +15,17 @@ import * as L from 'leaflet'
 })
 export class RouteFinderComponent implements OnInit {
 
-  form!:    FormGroup
-  loading   = false
-  geocoding = false
-  result:   any = null
+  form!:         FormGroup
+  loading      = false
+  geocoding    = false
+  navigating   = false
+  result:      any = null
+  selectedRoute: any = null
 
   private map:        L.Map | null        = null
   private routeLayer: L.LayerGroup | null = null
+  private userMarker: L.Marker | null     = null
+  private watchId:    number | null       = null
 
   constructor(
     private fb:     FormBuilder,
@@ -46,10 +50,7 @@ export class RouteFinderComponent implements OnInit {
   // ── Map init ──────────────────────────────────
   initMap(): void {
     if (this.map) return
-    this.map = L.map('route-map', {
-      center: [28.6139, 77.2090],
-      zoom:   12
-    })
+    this.map = L.map('route-map', { center: [28.6139, 77.2090], zoom: 12 })
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(this.map)
@@ -61,34 +62,107 @@ export class RouteFinderComponent implements OnInit {
     if (!this.map || !this.routeLayer) return
     this.routeLayer.clearLayers()
 
-    const safestRoute = data.routes.find((r: any) => r.isSafest)
-    if (!safestRoute?.path?.coordinates) return
+    // Sab routes draw karo
+    data.routes.forEach((route: any, index: number) => {
+      if (!route.path?.coordinates) return
 
-    const latlngs: [number, number][] = safestRoute.path.coordinates.map(
-      (c: number[]) => [c[1], c[0]] as [number, number]
+      const latlngs: [number, number][] = route.path.coordinates.map(
+        (c: number[]) => [c[1], c[0]] as [number, number]
+      )
+
+      const color   = route.safetyScore >= 70 ? '#1D9E75'
+                    : route.safetyScore >= 40 ? '#E5A020' : '#D85A30'
+      const weight  = route.isSafest ? 6 : 3
+      const opacity = route.isSafest ? 0.9 : 0.4
+      const dash    = route.isSafest ? '' : '8,8'
+
+      const polyline = L.polyline(latlngs, { color, weight, opacity, dashArray: dash })
+
+      polyline.on('click', () => {
+        this.selectedRoute = route
+        this.cdr.detectChanges()
+      })
+
+      polyline.bindTooltip(
+        `${route.isSafest ? '✅ Safest' : route.isFastest ? '⚡ Fastest' : 'Route ' + (index+1)} | Score: ${route.safetyScore} | ${route.distance}km | ${route.duration}min`,
+        { sticky: true }
+      )
+
+      polyline.addTo(this.routeLayer!)
+    })
+
+    // Start / End markers
+    const safest = data.routes.find((r: any) => r.isSafest)
+    if (safest?.path?.coordinates) {
+      const latlngs: [number, number][] = safest.path.coordinates.map(
+        (c: number[]) => [c[1], c[0]] as [number, number]
+      )
+
+      L.marker(latlngs[0], {
+        icon: L.divIcon({
+          className: '',
+          html: `<div style="width:32px;height:32px;border-radius:50%;background:#1D9E75;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.4)">📍</div>`,
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        })
+      }).bindPopup('<b>Start</b>').addTo(this.routeLayer!)
+
+      L.marker(latlngs[latlngs.length - 1], {
+        icon: L.divIcon({
+          className: '',
+          html: `<div style="width:32px;height:32px;border-radius:50%;background:#D85A30;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.4)">🏁</div>`,
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        })
+      }).bindPopup('<b>Destination</b>').addTo(this.routeLayer!)
+
+      this.map.fitBounds(L.latLngBounds(latlngs), { padding: [60, 60] })
+    }
+  }
+
+  // ── Navigation ────────────────────────────────
+  startNavigation(): void {
+    if (!this.selectedRoute?.path?.coordinates && !this.result?.routes?.[0]?.path?.coordinates) {
+      this.notify.error('No route selected')
+      return
+    }
+    this.navigating = true
+    this.notify.info('Navigation started! Follow the route.')
+    this.cdr.detectChanges()
+
+    this.watchId = navigator.geolocation.watchPosition(
+      pos => {
+        const latlng: [number, number] = [pos.coords.latitude, pos.coords.longitude]
+
+        if (this.userMarker) {
+          this.userMarker.setLatLng(latlng)
+        } else {
+          this.userMarker = L.marker(latlng, {
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="width:28px;height:28px;border-radius:50%;background:#534AB7;border:3px solid #fff;box-shadow:0 0 0 6px rgba(83,74,183,0.25),0 2px 8px rgba(0,0,0,0.4)"></div>`,
+              iconSize: [28, 28], iconAnchor: [14, 14]
+            })
+          }).addTo(this.map!)
+        }
+
+        this.map?.panTo(latlng)
+      },
+      () => this.notify.error('Could not track location'),
+      { enableHighAccuracy: true, maximumAge: 2000 }
     )
+  }
 
-    const color = safestRoute.safetyScore >= 70 ? '#1D9E75'
-                : safestRoute.safetyScore >= 40 ? '#E5A020' : '#D85A30'
-
-    // Route line
-    L.polyline(latlngs, { color, weight: 5, opacity: 0.85 })
-      .addTo(this.routeLayer)
-
-    // Start marker — green
-    L.circleMarker(latlngs[0], {
-      radius: 9, color: '#fff', weight: 2,
-      fillColor: '#1D9E75', fillOpacity: 1
-    }).bindPopup('<b>📍 Start</b>').addTo(this.routeLayer)
-
-    // End marker — red
-    L.circleMarker(latlngs[latlngs.length - 1], {
-      radius: 9, color: '#fff', weight: 2,
-      fillColor: '#D85A30', fillOpacity: 1
-    }).bindPopup('<b>🏁 End</b>').addTo(this.routeLayer)
-
-    // Fit map
-    this.map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40] })
+  stopNavigation(): void {
+    if (this.watchId !== null) {
+      navigator.geolocation.clearWatch(this.watchId)
+      this.watchId = null
+    }
+    if (this.userMarker) {
+      this.map?.removeLayer(this.userMarker)
+      this.userMarker = null
+    }
+    this.navigating = false
+    this.notify.info('Navigation stopped')
+    this.cdr.detectChanges()
   }
 
   // ── Getters ───────────────────────────────────
@@ -110,20 +184,15 @@ export class RouteFinderComponent implements OnInit {
 
   get scoreOffset() {
     const score = this.result?.routes[0]?.safetyScore || 0
-    const circumference = 2 * Math.PI * 54
-    return circumference - (score / 100) * circumference
+    return 2 * Math.PI * 54 - (score / 100) * 2 * Math.PI * 54
   }
 
   // ── Geocoding ─────────────────────────────────
   async geocodeAddress(address: string): Promise<{lat: number, lng: number} | null> {
     try {
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`
-      const res: any = await fetch(url, {
-        headers: { 'Accept-Language': 'en' }
-      }).then(r => r.json())
-      if (res && res.length > 0) {
-        return { lat: parseFloat(res[0].lat), lng: parseFloat(res[0].lon) }
-      }
+      const res: any = await fetch(url, { headers: { 'Accept-Language': 'en' } }).then(r => r.json())
+      if (res?.length > 0) return { lat: parseFloat(res[0].lat), lng: parseFloat(res[0].lon) }
       return null
     } catch { return null }
   }
@@ -133,41 +202,23 @@ export class RouteFinderComponent implements OnInit {
     const sourceAddr = this.form.get('sourceAddr')?.value
     const destAddr   = this.form.get('destAddr')?.value
 
-    if (!sourceAddr) {
-      this.notify.error('Please enter starting point')
-      return
-    }
-    if (!destAddr) {
-      this.notify.error('Please enter destination')
-      return
-    }
+    if (!sourceAddr) { this.notify.error('Please enter starting point'); return }
+    if (!destAddr)   { this.notify.error('Please enter destination'); return }
 
     this.geocoding = true
     this.result    = null
     this.cdr.detectChanges()
 
-    // Source — agar lat/lng already hai (current location) toh geocode mat karo
     let src = this.form.get('sourceLat')?.value
       ? { lat: this.form.get('sourceLat')?.value, lng: this.form.get('sourceLng')?.value }
       : await this.geocodeAddress(sourceAddr)
 
     const dst = await this.geocodeAddress(destAddr)
 
-    if (!src) {
-      this.notify.error(`Location not found: "${sourceAddr}"`)
-      this.geocoding = false
-      return
-    }
-    if (!dst) {
-      this.notify.error(`Location not found: "${destAddr}"`)
-      this.geocoding = false
-      return
-    }
+    if (!src) { this.notify.error(`Location not found: "${sourceAddr}"`); this.geocoding = false; return }
+    if (!dst) { this.notify.error(`Location not found: "${destAddr}"`);   this.geocoding = false; return }
 
-    this.form.patchValue({
-      sourceLat: src.lat, sourceLng: src.lng,
-      destLat:   dst.lat, destLng:   dst.lng
-    })
+    this.form.patchValue({ sourceLat: src.lat, sourceLng: src.lng, destLat: dst.lat, destLng: dst.lng })
 
     this.geocoding = false
     this.loading   = true
@@ -175,33 +226,27 @@ export class RouteFinderComponent implements OnInit {
 
     this.http.post(`${environment.apiUrl}/routes/calculate`, this.form.value).subscribe({
       next: (res: any) => {
-        this.result  = res.data
-        this.loading = false
+        this.result        = res.data
+        this.selectedRoute = res.data.routes.find((r: any) => r.isSafest)
+        this.loading       = false
         this.cdr.detectChanges()
         this.notify.success('Route calculated!')
-        this.drawRouteOnMap(res.data)  // ← MAP DRAW
+        this.drawRouteOnMap(res.data)
       },
-      error: () => {
-        this.loading = false
-        this.cdr.detectChanges()
-      }
+      error: () => { this.loading = false; this.cdr.detectChanges() }
     })
   }
 
   // ── Current Location ──────────────────────────
   useMyLocation(): void {
-    if (!navigator.geolocation) {
-      this.notify.error('Geolocation not supported')
-      return
-    }
+    if (!navigator.geolocation) { this.notify.error('Geolocation not supported'); return }
     navigator.geolocation.getCurrentPosition(
       pos => {
         this.form.patchValue({
-          sourceLat:  pos.coords.latitude,
-          sourceLng:  pos.coords.longitude,
+          sourceLat: pos.coords.latitude,
+          sourceLng: pos.coords.longitude,
           sourceAddr: 'My Location'
         })
-        // Map par bhi move karo
         if (this.map) {
           this.map.setView([pos.coords.latitude, pos.coords.longitude], 14)
           if (this.routeLayer) {

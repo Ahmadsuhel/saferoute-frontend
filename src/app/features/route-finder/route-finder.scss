@@ -422,3 +422,55 @@ form {
   position: sticky;
   top: 80px;
 }
+
+
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-navigate {
+  flex: 1;
+  height: 46px;
+  background: linear-gradient(135deg, #534AB7, #3730A3);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 20px rgba(83,74,183,0.3);
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(83,74,183,0.4);
+  }
+}
+
+.btn-stop {
+  flex: 1;
+  height: 46px;
+  background: rgba(216,90,48,0.1);
+  border: 1px solid rgba(216,90,48,0.3);
+  border-radius: 12px;
+  color: #D85A30;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+
+  &:hover { background: rgba(216,90,48,0.15) }
+}
